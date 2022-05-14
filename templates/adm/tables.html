@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Список таблиц
+{% endblock %}
+
+{% block body %}
+<h1>Список всех таблиц</h1>
+     {% if all_tables|length > 0 %}
+        {% for el in all_tables %}
+            <div class="alert alert-info">
+                <p><a href="/add/{{ el }}">{{ el }}</a></p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>В таблице нет записай</p>
+    {% endif %}
+
+{% endblock %}

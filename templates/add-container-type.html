@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Добавить контейнер
+{% endblock %}
+
+{% block body %}
+<h1>Добавить контейнер</h1>
+    <form method="post">
+        <input type="text" name="title" id="title" placeholder="Введите название" class="form-control"><br>
+        <input type="submit" value="Отправить" class="btn btn-success"><br>
+    </form>
+
+    {% if cont_types|length > 0 %}
+        {% for el in cont_types %}
+            <div class="alert alert-info">
+                <p>{{ el.title }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Ни одного контейнера не создано</p>
+    {% endif %}
+
+{% endblock %}
