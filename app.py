@@ -48,6 +48,33 @@ class containers(db.Model):
 def index():
     return render_template('index.html')
 
+@app.route('/add/<string:table_name>', methods=['POST', 'GET'])
+def add_any_row(table_name):
+    """
+    Admin page for maintenance any table by hand
+    """
+    table_rows = globals()[table_name].query.order_by(globals()[table_name].title).all()
+    table_columns = tables[table_name]
+    if request.method == 'POST':
+        title = request.form['title']
+        is_present = False
+        for el in table_rows:
+            if title == str(el.title):
+                # is_present = True
+                return 'Такая запись уже есть!'
+        if not is_present:
+            new_els = {key: request.form[key] for key in table_columns}
+            new_row = globals()[table_name](**new_els)  # Как сюда запихать список полей?
+            try:
+                db.session.add(new_row)
+                db.session.commit()
+                return redirect(f'/add/{table_name}')
+            except Exception as e:
+                return "Ошибка записи в БД: " + str(e)
+
+#    return render_template(f'add/{table_name}.html', cont_types=cont_types)
+    return render_template('add/row.html', table_rows=table_rows, table_columns=table_columns, table_name=table_name)
+
 
 def make_table_list():
     """
@@ -57,7 +84,7 @@ def make_table_list():
 
     unuseful = ('id', 'creation_date')  # Tuple of unuseful columns
     result = {}
-    classes = [(cls_name, cls_obj) for cls_name, cls_obj in inspect.getmembers(sys.modules['db_classes'])
+    classes = [(cls_name, cls_obj) for cls_name, cls_obj in inspect.getmembers(sys.modules['__main__'])
                if inspect.isclass(cls_obj)]  # List of all classes
 
     for db_class in classes:
@@ -73,5 +100,4 @@ def make_table_list():
 
 if __name__ == '__main__':
     tables = make_table_list()
-    print(tables)
     app.run(debug=True)
