@@ -2,12 +2,12 @@ import inspect
 import sys
 from datetime import datetime
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
 #from db_classes import dev_types
-
+from werkzeug.utils import redirect
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///crsched.db'
@@ -48,15 +48,27 @@ class containers(db.Model):
 def index():
     return render_template('index.html')
 
+
+@app.route('/adm/tables')
+def tables():
+    """
+    Admin page. List of all tables.
+    """
+    print(all_tables.keys())
+    return render_template('adm/tables.html', all_tables=list(all_tables.keys()))
+
+
 @app.route('/add/<string:table_name>', methods=['POST', 'GET'])
 def add_any_row(table_name):
     """
     Admin page for maintenance any table by hand
     """
     table_rows = globals()[table_name].query.order_by(globals()[table_name].title).all()
-    table_columns = tables[table_name]
+    table_columns = all_tables[table_name]
     if request.method == 'POST':
         title = request.form['title']
+        if not title:
+            return 'Название не может быть пустым'
         is_present = False
         for el in table_rows:
             if title == str(el.title):
@@ -99,5 +111,5 @@ def make_table_list():
 
 
 if __name__ == '__main__':
-    tables = make_table_list()
+    all_tables = make_table_list()
     app.run(debug=True)
