@@ -88,6 +88,18 @@ def add_any_row(table_name):
     return render_template('add/row.html', table_rows=table_rows, table_columns=table_columns, table_name=table_name)
 
 
+@app.route('/delete/<string:table_name>/<int:row_id>')
+def post_delete(table_name, row_id):
+    row = globals()[table_name].query.get_or_404(row_id)
+    print(row)
+    try:
+        db.session.delete(row)
+        db.session.commit()
+        return redirect(f'/add/{table_name}')
+    except Exception as e:
+        return "Ошибка удаления из БД: " + str(e)
+
+
 def make_table_list():
     """
     Make list of useful columns in dict of tables.

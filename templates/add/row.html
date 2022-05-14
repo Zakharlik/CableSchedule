@@ -17,6 +17,7 @@
         {% for el in table_rows %}
             <div class="alert alert-info">
                 <p>{{ el.title }}</p>
+                <a href="/delete/{{ table_name }}/{{ el.id }}" class="btn btn-danger">Удалить</a>
             </div>
         {% endfor %}
     {% else %}
