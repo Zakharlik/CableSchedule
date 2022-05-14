@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
@@ -19,6 +19,6 @@ def index():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    tables = make_table_list()
-    print(make_table_list())
+#    tables = make_table_list()
+#    print(make_table_list())
     app.run(debug=True)

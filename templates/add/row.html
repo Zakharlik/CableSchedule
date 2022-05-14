@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Добавить строку
+{% endblock %}
+
+{% block body %}
+<h1>Добавить строку в таблицу {{ table_name }}</h1>
+    <form method="post">
+        {% for coll in table_columns %}
+          <input type="text" name={{ coll }} id={{ coll }} placeholder="Введите значение {{ coll }}" class="form-control"><br>
+        {% endfor %}
+        <input type="submit" value="Отправить" class="btn btn-success"><br>
+    </form>
+
+    {% if table_rows|length > 0 %}
+        {% for el in table_rows %}
+            <div class="alert alert-info">
+                <p>{{ el.title }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>В таблице нет записай</p>
+    {% endif %}
+
+{% endblock %}
