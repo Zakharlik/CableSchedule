@@ -5,7 +5,10 @@
 {% endblock %}
 
 {% block body %}
-<h1>Добавить порт {{ table_name }}</h1>
+<h1>Добавить порт
+    {% if patch_panel %}
+        в {{ patch_panel }}
+    {% endif %}</h1>
     {% if message %}
     <div class="alert-warning">
         <h4>

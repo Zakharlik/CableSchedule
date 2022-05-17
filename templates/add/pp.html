@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Добавить патч-панель/бокс
+{% endblock %}
+
+{% block body %}
+<h1>Добавить патч-панель/бокс</h1>
+    {% if message %}
+    <div class="alert-warning">
+        <h4>
+            {{ message }}
+        </h4>
+    </div>
+    {% endif %}
+
+    <form method="post">
+        <div class="pb-3">
+            <label for="title">Введите название пач-панели/бокса:</label>
+            <input type="text" name="title" id="title" placeholder="Введите название пач-панели/бокса" class="form-control">
+        </div>
+
+        <div class="pb-3">
+
+               <label class="me-3 py-2 text-dark text-decoration-none" for="pp_type">Выберите тип пач-панели/бокса:</label>
+            <div class="flex-column flex-md-row align-items-center">
+            <select class="form-select" aria-label="Default select example" id="pp_type" name="pp_type">
+                    {% for pp in pp_types_list %}
+                        <option value="{{ pp.id }}">{{ pp.title }}</option>
+                    {% endfor %}
+            </select>
+                <nav class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
+                    <a class="btn btn-secondary" href="add/pp_type">Создать тип пачпанели</a>
+                </nav>
+            </div>
+
+        </div>
+
+        <div class="pb-3">
+            <div class="flex-column flex-md-row align-items-center">
+                <label class="me-3 py-2 text-dark text-decoration-none" for="container">
+                   Выберите контейнер или оставьте пустым:
+                </label>
+            </div>
+            <div class="flex-column flex-md-row align-items-center">
+                <select class="form-select" aria-label="Default select example" id="container" name="container">
+                <option selected>Нет панели</option>
+                    {% for container in containers_list %}
+                    <option value="{{ container.id }}">{{ container.title }}</option>
+                    {% endfor %}
+                </select>
+                    <a class="btn btn-secondary" href="add/container">Создать контейнер</a>
+            </div>
+        </div>
+
+        <div class="pb-3">
+
+        <label for="num_of_ports">Введите количество портов</label>
+        <input type="text" name="num_of_ports" id="num_of_ports" placeholder="Введите количество портов" class="form-control">
+        </div>
+
+       <div class="pb-3">
+            <div class="flex-column flex-md-row align-items-center">
+                <label class="me-3 py-2 text-dark text-decoration-none" for="port_type">
+                   Выберите тип порта или оставьте пустым:
+                </label>
+            </div>
+            <div class="flex-column flex-md-row align-items-center">
+                <select class="form-select" aria-label="Default select example" id="port_type" name="port_type">
+                <option selected>Нет типа порта</option>
+                    {% for port_type in port_types_list %}
+                    <option value="{{ port_type.id }}">{{ port_type.title }}</option>
+                    {% endfor %}
+                </select>
+                    <a class="btn btn-secondary" href="add/port_type">Создать тип порта</a>
+            </div>
+        </div>
+
+
+        <input type="submit" value="Отправить" class="btn btn-success"><br>
+    </form>
+
+{% endblock %}

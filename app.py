@@ -199,6 +199,49 @@ def add_port():
     return render_template('add/port.html', port_types_list=port_types_list, patch_panels_list=patch_panels_list)
 
 
+@app.route('/add/pp', methods=['POST', 'GET'])
+def add_pp():
+    """
+    User page for creating patch panels
+    """
+    param_dict = {'pp_types_list': pp_types.query.order_by(pp_types.title).all(),
+                  'containers_list': containers.query.order_by(containers.title).all(),
+                  'port_types_list': port_types.query.order_by(port_types.title).all(),
+                  'message':''
+                  }
+    if request.method == 'POST':
+        title = request.form['title']
+        pp_type_id = request.form['pp_type']
+        container_id = request.form['container']
+        num_of_ports = request.form['num_of_ports']
+        port_type_id = request.form['port_type']
+        if not title:
+            param_dict['message'] = 'Название не может быть пустым.'
+            return render_template('add/pp.html', **param_dict)
+        is_present = False
+        for el in patch_panels.query.all():
+            if title == str(el.title):
+                if patch_panels.query.filter_by(container_id=container_id, title=title):
+                    param_dict['message'] = f'Такaя пач панель уже есть в контейнере ' \
+                                            f'{containers.query.filter_by(container_id=container_id).first().title}!'
+                    return render_template('add/pp.html', **param_dict)
+        new_row = patch_panels(title=title, container_id=container_id, num_of_ports=num_of_ports, pp_type_id=pp_type_id)
+        try:
+            db.session.add(new_row)
+            db.session.commit()
+        except Exception as e:
+            return "Ошибка записи в БД: " + str(e)
+
+        # Создаем стороны пачпанели. Линейную и Аббонентскую.
+        # Линейная
+        patch_panel_id = patch_panels.query.filter_by(title=title, container_id=container_id,
+                                                      num_of_ports=num_of_ports, pp_type_id=pp_type_id).first().id
+        add_pp_side(patch_panel_id=patch_panel_id, num_of_ports=patch_panel_id, is_line_side=True, port_type_id=port_type_id)
+        add_pp_side(patch_panel_id=patch_panel_id, num_of_ports=patch_panel_id, is_line_side=False, port_type_id=port_type_id)
+
+    return render_template('add/pp.html',  **param_dict)
+
+
 @app.route('/delete/<string:table_name>/<int:row_id>')
 def row_delete(table_name, row_id):
     row = globals()[table_name].query.get_or_404(row_id)
@@ -209,6 +252,28 @@ def row_delete(table_name, row_id):
         return redirect(url_for('add_any_row', table_name=table_name))
     except Exception as e:
         return "Ошибка удаления из БД: " + str(e)
+
+
+def add_pp_side(patch_panel_id, num_of_ports, is_line_side, port_type_id):
+    new_row = pp_sides(patch_panel_id=patch_panel_id, is_line_side=is_line_side)
+    try:
+        db.session.add(new_row)
+        db.session.commit()
+    except Exception as e:
+        return "Ошибка записи в БД: " + str(e)
+
+    pp_side_id = pp_sides.query.filter_by(patch_panel_id=patch_panel_id, is_line_side=is_line_side).first().id
+    add_ports(pp_side_id, port_type_id=port_type_id, num_of_ports=num_of_ports)
+
+def add_ports(pp_side_id, port_type_id, num_of_ports):
+    for p in range(num_of_ports):
+        new_row = ports(title=str(p), port_type_id=port_type_id, pp_side_id=pp_side_id)
+        db.session.add(new_row)
+    try:
+        db.session.commit()
+    except Exception as e:
+        return "Ошибка записи в БД: " + str(e)
+
 
 
 def make_table_list():
