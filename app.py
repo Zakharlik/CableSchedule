@@ -136,7 +136,8 @@ def add_any_row(table_name):
     if request.method == 'POST':
         title = request.form['title']
         if not title:
-            return 'Название не может быть пустым'
+            return render_template('adm/add/row.html', table_rows=table_rows, table_columns=table_columns,
+                                   table_name=table_name, message='Название не может быть пустым')
         is_present = False
         for el in table_rows:
             if title == str(el.title):
@@ -151,8 +152,7 @@ def add_any_row(table_name):
                 db.session.commit()
                 return redirect(f'/adm/add/{table_name}')
             except Exception as e:
-                return render_template('adm/add/row.html', table_rows=table_rows, table_columns=table_columns,
-                                table_name=table_name, message=("Ошибка записи в БД: " + str(e)))
+                return "Ошибка записи в БД: " + str(e)
 
 
 #    return render_template(f'add/{table_name}.html', cont_types=cont_types)
