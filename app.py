@@ -117,12 +117,17 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/create')
+def create():
+    return render_template('create.html')
+
+
 @app.route('/adm/tables')
 def tables():
     """
     Admin page. List of all tables.
     """
-    print(all_tables.keys())
+#    print(all_tables.keys())
     return render_template('adm/tables.html', all_tables=list(all_tables.keys()))
 
 
@@ -153,11 +158,45 @@ def add_any_row(table_name):
                 return redirect(f'/adm/add/{table_name}')
             except Exception as e:
                 return "Ошибка записи в БД: " + str(e)
-
-
-#    return render_template(f'add/{table_name}.html', cont_types=cont_types)
-#    return render_template(url_for('add_any_row', table_name=table_name), table_rows=table_rows, table_columns=table_columns)
     return render_template('adm/add/row.html', table_rows=table_rows, table_columns=table_columns, table_name=table_name)
+
+
+@app.route('/add/port', methods=['POST', 'GET'])
+def add_port():
+    """
+    User page for creating ports
+    """
+    port_types_list = port_types.query.order_by(port_types.title).all()
+    print(type(port_types_list), port_types_list[1].title)
+    patch_panels_list = patch_panels.query.order_by(patch_panels.title).all()
+
+    if request.method == 'POST':
+        port_type_id = request.form['port_type']
+        pp = request.form['pp']
+        print(port_type_id, pp)
+        title = request.form['title']
+        if not title:
+            return render_template('add/port.html', port_types_list=port_types_list,
+                                   patch_panels_list=patch_panels_list, message='Название не может быть пустым')
+
+        is_present = False
+        for el in ports.query.all():
+            if title == str(el.title):
+                # is_present = True
+                return render_template('add/port.html', port_types_list=port_types_list,
+                                   patch_panels_list=patch_panels_list, message='Такой порт уже есть!')
+        if not is_present:
+            # TODO: Add check PP exists
+            # TODO: Add choose of PP side
+            new_row = ports(title=title, port_type_id=port_type_id)
+            try:
+                db.session.add(new_row)
+                db.session.commit()
+                return redirect('/add/port')
+            except Exception as e:
+                return "Ошибка записи в БД: " + str(e)
+
+    return render_template('add/port.html', port_types_list=port_types_list, patch_panels_list=patch_panels_list)
 
 
 @app.route('/delete/<string:table_name>/<int:row_id>')

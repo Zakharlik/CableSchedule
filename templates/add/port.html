@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Добавить порт
+{% endblock %}
+
+{% block body %}
+<h1>Добавить порт {{ table_name }}</h1>
+    {% if message %}
+    <div class="alert-warning">
+        <h4>
+            {{ message }}
+        </h4>
+    </div>
+    {% endif %}
+
+    <form method="post">
+        <label for="title">Введите название порта:</label>
+        <input type="text" name="title" id="title" placeholder="Введите название порта" class="form-control">
+
+        <label for="port_type">Выберите тип порта:</label>
+        <select class="form-select" aria-label="Default select example" id="port_type" name="port_type">
+                {% for port in port_types_list %}
+                    <option value="{{ port.id }}">{{ port.title }}</option>
+                {% endfor %}
+        </select>
+
+        <label for="pp">Выберите пач-панель или оставьте пустым:</label>
+        <select class="form-select" aria-label="Default select example" id="pp" name="pp">
+            <option selected>Нет панели</option>
+                {% for pз in patch_panels_list %}
+                    <option value="{{ pp.id }}">{{ pp.title }}</option>
+                {% endfor %}
+        </select>
+        <input type="submit" value="Отправить" class="btn btn-success"><br>
+    </form>
+
+{% endblock %}
