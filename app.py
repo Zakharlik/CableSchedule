@@ -17,12 +17,29 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 
+class cable_types(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    connector_a_id = db.Column(db.Integer, db.ForeignKey('connectors.id'), nullable=False)
+    connector_b_id = db.Column(db.Integer, db.ForeignKey('connectors.id'), nullable=False)
+    creation_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class cables(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    port_a_id = db.Column(db.Integer, db.ForeignKey('ports.id'), nullable=False)
+    port_b_id = db.Column(db.Integer, db.ForeignKey('ports.id'), nullable=False)
+    cable_type_id = db.Column(db.Integer, db.ForeignKey('cable_types.id'), nullable=True)
+    creation_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 class connector_types(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     num_of_pins = db.Column(db.Integer, nullable=False)
     is_male = db.Column(db.Boolean, nullable=True)
-#    connectors = db.relationship('connectors', backref='connector_type', lazy=True)
+    connectors = db.relationship('connectors', backref='connector_type', lazy=True)
     creation_date = db.Column(db.DateTime, default=datetime.utcnow)
 
 
@@ -47,9 +64,38 @@ class containers(db.Model):
     creation_date = db.Column(db.DateTime, default=datetime.utcnow)
 
 
+class dev_card_types(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    creation_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 class dev_types(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
+    creation_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class patch_panels(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    num_of_ports = db.Column(db.Integer, nullable=False)
+    container_id = db.Column(db.Integer, db.ForeignKey('containers.id'), nullable=True)
+    pp_type_id = db.Column(db.Integer, db.ForeignKey('pp_types.id'), nullable=False)
+    creation_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class port_types(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    creation_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class ports(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    port_type_id = db.Column(db.Integer, db.ForeignKey('port_types.id'), nullable=False)
+    pp_side_id = db.Column(db.Integer, db.ForeignKey('pp_sides.id'), nullable=True)
     creation_date = db.Column(db.DateTime, default=datetime.utcnow)
 
 
@@ -58,6 +104,12 @@ class pp_types(db.Model):
     title = db.Column(db.String(100), nullable=False)
     creation_date = db.Column(db.DateTime, default=datetime.utcnow)
 
+
+class pp_sides(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    is_line_side = db.Column(db.Boolean, nullable=True)
+    patch_panel_id = db.Column(db.Integer, db.ForeignKey('patch_panels.id'), nullable=False)
+    creation_date = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 @app.route('/')
