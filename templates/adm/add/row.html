@@ -6,6 +6,13 @@
 
 {% block body %}
 <h1>Добавить строку в таблицу {{ table_name }}</h1>
+    {% if message %}
+    <div class="alert-warning">
+        <h4>
+            {{ message }}
+        </h4>
+    </div>
+    {% endif %}
     <form method="post">
         {% for coll in table_columns %}
           <input type="text" name={{ coll }} id={{ coll }} placeholder="Введите значение {{ coll }}" class="form-control"><br>
@@ -17,7 +24,8 @@
         {% for el in table_rows %}
             <div class="alert alert-info">
                 <p>{{ el.title }}</p>
-                <a href="/delete/{{ table_name }}/{{ el.id }}" class="btn btn-danger">Удалить</a>
+                <a href={{ url_for('row_delete', table_name=table_name, row_id=el.id)}} class="btn btn-danger">Удалить</a>
+
             </div>
         {% endfor %}
     {% else %}

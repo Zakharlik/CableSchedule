@@ -2,7 +2,7 @@ import inspect
 import sys
 from datetime import datetime
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, url_for
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
@@ -126,7 +126,7 @@ def tables():
     return render_template('adm/tables.html', all_tables=list(all_tables.keys()))
 
 
-@app.route('/add/<string:table_name>', methods=['POST', 'GET'])
+@app.route('/adm/add/<string:table_name>', methods=['POST', 'GET'])
 def add_any_row(table_name):
     """
     Admin page for maintenance any table by hand
@@ -141,29 +141,33 @@ def add_any_row(table_name):
         for el in table_rows:
             if title == str(el.title):
                 # is_present = True
-                return 'Такая запись уже есть!'
+                return render_template('adm/add/row.html', table_rows=table_rows, table_columns=table_columns,
+                                table_name=table_name, message='Такая запись уже есть!')
         if not is_present:
             new_els = {key: request.form[key] for key in table_columns}
-            new_row = globals()[table_name](**new_els)  # Как сюда запихать список полей?
+            new_row = globals()[table_name](**new_els)
             try:
                 db.session.add(new_row)
                 db.session.commit()
-                return redirect(f'/add/{table_name}')
+                return redirect(f'/adm/add/{table_name}')
             except Exception as e:
-                return "Ошибка записи в БД: " + str(e)
+                return render_template('adm/add/row.html', table_rows=table_rows, table_columns=table_columns,
+                                table_name=table_name, message=("Ошибка записи в БД: " + str(e)))
+
 
 #    return render_template(f'add/{table_name}.html', cont_types=cont_types)
-    return render_template('add/row.html', table_rows=table_rows, table_columns=table_columns, table_name=table_name)
+#    return render_template(url_for('add_any_row', table_name=table_name), table_rows=table_rows, table_columns=table_columns)
+    return render_template('adm/add/row.html', table_rows=table_rows, table_columns=table_columns, table_name=table_name)
 
 
 @app.route('/delete/<string:table_name>/<int:row_id>')
-def post_delete(table_name, row_id):
+def row_delete(table_name, row_id):
     row = globals()[table_name].query.get_or_404(row_id)
     print(row)
     try:
         db.session.delete(row)
         db.session.commit()
-        return redirect(f'/add/{table_name}')
+        return redirect(url_for('add_any_row', table_name=table_name))
     except Exception as e:
         return "Ошибка удаления из БД: " + str(e)
 

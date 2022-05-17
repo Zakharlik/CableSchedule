@@ -9,7 +9,7 @@
      {% if all_tables|length > 0 %}
         {% for el in all_tables %}
             <div class="alert alert-info">
-                <p><a href="/add/{{ el }}">{{ el }}</a></p>
+                <p><a href={{ url_for('add_any_row', table_name=el) }}>{{ el }}</a></p>
             </div>
         {% endfor %}
     {% else %}
