@@ -18,6 +18,7 @@
     {% endif %}
 
     <form method="post">
+        <div class="pb-3">
         <label for="title">Введите название порта:</label>
         <input type="text" name="title" id="title" placeholder="Введите название порта" class="form-control">
 
@@ -27,14 +28,17 @@
                     <option value="{{ port.id }}">{{ port.title }}</option>
                 {% endfor %}
         </select>
+         <a class="btn btn-secondary" href="/add/port_type">Создать тип порта</a>
 
         <label for="pp">Выберите пач-панель или оставьте пустым:</label>
         <select class="form-select" aria-label="Default select example" id="pp" name="pp">
             <option selected>Нет панели</option>
-                {% for pз in patch_panels_list %}
+                {% for pp in patch_panels_list %}
                     <option value="{{ pp.id }}">{{ pp.title }}</option>
                 {% endfor %}
         </select>
+         <a class="btn btn-secondary" href="/add/pp">Создать тип патч-панели</a><br>
+        </div>
         <input type="submit" value="Отправить" class="btn btn-success"><br>
     </form>
 

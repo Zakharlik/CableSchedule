@@ -160,7 +160,6 @@ def add_any_row(table_name):
                 return "Ошибка записи в БД: " + str(e)
     return render_template('adm/add/row.html', table_rows=table_rows, table_columns=table_columns, table_name=table_name)
 
-
 @app.route('/add/port', methods=['POST', 'GET'])
 def add_port():
     """
@@ -207,7 +206,7 @@ def add_pp():
     param_dict = {'pp_types_list': pp_types.query.order_by(pp_types.title).all(),
                   'containers_list': containers.query.order_by(containers.title).all(),
                   'port_types_list': port_types.query.order_by(port_types.title).all(),
-                  'message':''
+                  'message': ''
                   }
     if request.method == 'POST':
         title = request.form['title']
